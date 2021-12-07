@@ -9,7 +9,6 @@ public class PropertiesToYaml {
 
     public static void convertSingleFile(File file) throws IOException {
         if (file.exists() && file.getName().endsWith(".properties")) {
-            new String().matches("\\*.properties");
             outputPath = file.getParent() + "/out";
             p2y(file);
         }
@@ -37,15 +36,8 @@ public class PropertiesToYaml {
         FileWriter fileWriter = new FileWriter(outputPath + "/" + name.substring(0, name.lastIndexOf(".")) + ".yml");
         ArrayList<String> sortedKeys = sortKeys(properties);
         for (int i = 0; i < sortedKeys.size(); i++) {
-            if (i == 0) {
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String s : sortedKeys.get(i).split("\\.")) {
-                    stringBuilder.append("  ");
-                    fileWriter.write("\n" + stringBuilder + s + ":");
-                }
-                fileWriter.write(" " + properties.getProperty(sortedKeys.get(i)));
-            }else {
-                String[] thisKey = sortedKeys.get(i).split("\\.");
+            String[] thisKey = sortedKeys.get(i).split("\\.");
+            if (i > 0) {
                 String[] previousKey = sortedKeys.get(i - 1).split("\\.");
                 for (int j = 0; j < Math.min(thisKey.length, previousKey.length); j++) {
                     if (thisKey[j].equals(previousKey[j])) {
@@ -54,17 +46,17 @@ public class PropertiesToYaml {
                         break;
                     }
                 }
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String s : thisKey) {
-                    if (s.equals("  ")) {
-                        stringBuilder.append(s);
-                    }else {
-                        stringBuilder.append("  ");
-                        fileWriter.write("\n" + stringBuilder + s + ":");
-                    }
-                }
-                fileWriter.write(" " + properties.getProperty(sortedKeys.get(i)));
             }
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String s : thisKey) {
+                if (s.equals("  ")) {
+                    stringBuilder.append(s);
+                }else {
+                    stringBuilder.append("  ");
+                    fileWriter.write("\n" + stringBuilder + s + ":");
+                }
+            }
+            fileWriter.write(" " + properties.getProperty(sortedKeys.get(i)));
         }
         fileWriter.close();
     }
